@@ -2,6 +2,14 @@
 
 A low birth rate and rising life expectancy are fueling demographic change in Germany. These trends pose economic challenges such as a dwindling labor force and the underfunding of social security systems. As a result, lawmakers must re-evaluate existing public policies and design new solutions. This case study provides data visualizations supporting the exploration and evaluation of policy options to solve these demographic problems.
 
+## Visualizations
+
+A visualization of the average live births per woman over time. The data is grouped by region: Federal Republic of Germany, former territory of the Federal Republic, former territory of East Germany.
+
+<p align="center">
+    <img src="figures/plot_1_fertility_rate.png" alt="Total Fertility Rate in Germany" height="384">
+</p
+
 ## References
 
 I used data from the following sources:
