@@ -10,6 +10,8 @@ A visualization of the average live births per woman over time. The data is grou
     <img src="figures/plot_1_fertility_rate.png" alt="Total Fertility Rate in Germany" height="384">
 </p
 
+Check out a detailed implementation of the visualizations in `notebook.pdf`.
+
 ## References
 
 I used data from the following sources:
