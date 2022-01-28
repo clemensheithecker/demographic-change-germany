@@ -30,6 +30,7 @@ The project's source files as well as references are published on the [project's
 
 ```{r libraries}
 library(here)
+library(maps)
 library(readxl)
 library(tidyverse)
 ```
@@ -295,7 +296,7 @@ ggplot(data = poverty_risk_rate_long,
       paste0(x, "%")
   ) +
   labs(
-    title = "Fig. 2: At-Risk-Of-Poverty Rate Of Families",
+    title = "Fig. 2: At-Risk-of-Poverty Rate of Families",
     subtitle = "Measured by median income",
     x = element_blank(),
     y = element_blank(),
@@ -331,6 +332,164 @@ Save figure as .png file.
 ```{r}
 ggsave(
   "figures/plot_2_poverty_risk_rate.png",
+  width = 24,
+  height = 18,
+  units = "cm",
+  dpi = "retina",
+  bg = "white"
+)
+```
+
+## Total Fertility Rates in Europe
+
+A map visualization to compare the total fertility rates between countries of the European Union and the European Free Trade Association.
+
+### Reading and Cleaning Data
+
+Reading the .csv file using readr's *read_csv* function.
+
+```{r}
+fertility_rate_eu <- read_csv(
+  file = "data/estat_tps00199.csv",
+  col_names = c("Country Code", seq(
+    from = 2008, to = 2019, by = 1
+  )),
+  col_types = "cnnnnnnnnnnnn",
+  na = ":",
+  trim_ws = TRUE,
+  skip = 1
+)
+
+head(fertility_rate_eu)
+```
+
+Clean up the 'Country Code' column by removing the leading string 'A;TOTFERRT;' of every entry.
+
+```{r}
+fertility_rate_eu <- fertility_rate_eu %>%
+  mutate(`Country Code` = sub("A;TOTFERRT;", "", `Country Code`))
+
+head(fertility_rate_eu)
+```
+
+Define lists of countries which are part of the European Union (EU) and the European Free Trade Association (EFTA). The lists include the ISO 3166-1 Alpha-2 code country abbreviation as key as well as the full country name as correspondig value. The lists are from the following sources: [Member state of the European Union—Wikipedia](https://en.wikipedia.org/wiki/Member_state_of_the_European_Union), [European Free Trade Association—Wikipedia](https://en.wikipedia.org/wiki/European_Free_Trade_Association), and [ISO 3166-1—Wikipedia](https://en.wikipedia.org/wiki/ISO_3166-1)
+
+```{r}
+eu_countries <- list(
+  "BE" = "Belgium",
+  "BG" = "Bulgaria",
+  "CZ" = "Czechia",
+  "DK" = "Denmark",
+  "DE" = "Germany",
+  "EE" = "Estonia",
+  "IE" = "Ireland",
+  "EL" = "Greece",
+  "ES" = "Spain",
+  "FR" = "France",
+  "HR" = "Croatia",
+  "IT" = "Italy",
+  "CY" = "Cyprus",
+  "LV" = "Latvia",
+  "LT" = "Lithuania",
+  "LU" = "Luxembourg",
+  "HU" = "Hungary",
+  "MT" = "Malta",
+  "NL" = "Netherlands",
+  "AT" = "Austria",
+  "PL" = "Poland",
+  "PT" = "Portugal",
+  "RO" = "Romania",
+  "SI" = "Slovenia",
+  "SK" = "Slovakia",
+  "FI" = "Finland",
+  "SE" = "Sweden",
+  "UK" = "United Kingdom"
+)
+
+efta_countries <- list(
+  "IS" = "Iceland",
+  "LI" = "Liechtenstein",
+  "NO" = "Norway",
+  "CH" = "Switzerland"
+)
+```
+
+Select only the latest time period of the time series data, 2019, and rename the column to 'Fertility Rate'. Add another column 'region' with the full country name.
+
+```{r}
+fertility_rate_eu <- fertility_rate_eu %>%
+  select(`Country Code`, `2019`) %>%
+  rename(`Fertility Rate` = `2019`) %>%
+  filter(`Country Code` %in% c(names(eu_countries), names(efta_countries))) %>%
+  mutate(region = as.character(append(eu_countries, efta_countries)[`Country Code`]))
+
+head(fertility_rate_eu)
+```
+
+Prepare map data by downloading maps' world data and joining it with the fertility_rate_eu dataframe.
+
+```{r}
+eu_map <- map_data("world")
+
+eu_fertility_map <- left_join(eu_map, fertility_rate_eu, by = "region")
+
+tail(eu_fertility_map)
+```
+
+### Plot Data
+
+Plotting the data as a map.
+
+```{r}
+ggplot(data = eu_fertility_map, mapping = aes(x = long, y = lat)) +
+  geom_polygon(
+    mapping = aes(group = group, fill = `Fertility Rate`),
+    size = 0.25,
+    color = colors_primary$very_light_gray
+  ) +
+  
+  xlim(-25, 35) +
+  ylim(34, 71.5) +
+  coord_map() +
+  theme_void() +
+  scale_fill_stepsn(
+    colors = c(
+      colors_primary$very_light_blue,
+      colors_primary$light_blue,
+      colors_primary$blue,
+      colors_primary$dark_blue,
+      colors_primary$very_dark_blue
+    ),
+    na.value = colors_primary$very_light_gray
+  ) +
+  labs(
+    title = "Fig. 3: Total Fertility Rates in Europe",
+    subtitle = "EU and EFTA countries in 2019",
+    x = element_blank(),
+    y = element_blank(),
+    caption = "Source: eurostat"
+  ) +
+  theme(
+    legend.text = element_text(color = colors_secondary$text, size = rel(1.4)),
+    legend.title = element_blank(),
+    plot.caption = element_text(color = colors_secondary$caption,
+                                size = rel(1.4)),
+    plot.subtitle = element_text(color = colors_secondary$title,
+                                 size = rel(1.6),),
+    plot.title = element_text(
+      color = colors_secondary$title,
+      size = rel(1.8),
+      face = "bold",
+      family = "serif"
+    )
+  )
+```
+
+Save figure as .png file.
+
+```{r}
+ggsave(
+  "figures/plot_3_fertility_rate_eu.png",
   width = 24,
   height = 18,
   units = "cm",

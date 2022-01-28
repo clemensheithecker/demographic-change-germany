@@ -13,7 +13,13 @@ A visualization of the average live births per woman over time. The data is grou
 A visual comparison of the at-risk-of-poverty rate by household type. The rate is measured against the federal median income.
 
 <p align="center">
-    <img src="figures/plot_2_poverty_risk_rate.png" alt="At-Risk-Of-Poverty Rate Of Families" height="384">
+    <img src="figures/plot_2_poverty_risk_rate.png" alt="At-Risk-of-Poverty Rate of Families" height="384">
+</p
+
+A map visualization to compare the total fertility rates between countries of the European Union and the European Free Trade Association.
+
+<p align="center">
+    <img src="figures/plot_3_fertility_rate_eu.png" alt="Total Fertility Rates in Europe" height="384">
 </p
 
 Check out a detailed implementation of the visualizations in `notebook.pdf`.
