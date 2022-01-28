@@ -10,6 +10,12 @@ A visualization of the average live births per woman over time. The data is grou
     <img src="figures/plot_1_fertility_rate.png" alt="Total Fertility Rate in Germany" height="384">
 </p
 
+A visual comparison of the at-risk-of-poverty rate by household type. The rate is measured against the federal median income.
+
+<p align="center">
+    <img src="figures/plot_2_poverty_risk_rate.png" alt="At-Risk-Of-Poverty Rate Of Families" height="384">
+</p
+
 Check out a detailed implementation of the visualizations in `notebook.pdf`.
 
 ## References

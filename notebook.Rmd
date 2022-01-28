@@ -29,8 +29,9 @@ The project's source files as well as references are published on the [project's
 ## Libraries
 
 ```{r libraries}
-library(tidyverse)
 library(here)
+library(readxl)
+library(tidyverse)
 ```
 
 ## Global Styles and Colors
@@ -71,12 +72,10 @@ fertility_rate <-
     file = here("data", "completed-cohort-fertility.csv"),
     delim = ";",
     escape_double = FALSE,
-    col_names = c(
-      "Year",
-      "Germany",
-      "Old Federal States",
-      "New Federal States"
-    ),
+    col_names = c("Year",
+                  "Germany",
+                  "Old Federal States",
+                  "New Federal States"),
     col_types = "innn",
     locale = locale(
       decimal_mark = ".",
@@ -94,10 +93,8 @@ Reshape data frame to long format. Having a column for every variable and a row 
 
 ```{r}
 fertility_rate_long <- fertility_rate %>%
-  gather(
-    key = "Country/Region",
-    value = "Total Fertility Rate",
-    -"Year")
+  gather(key = "Country/Region",
+         value = "Total Fertility Rate", -"Year")
 
 tail(fertility_rate_long)
 ```
@@ -110,11 +107,9 @@ the plot. Additionally, give factors more descriptive names.
 fertility_rate_long$`Country/Region` <-
   factor(
     fertility_rate_long$`Country/Region`,
-    c(
-      "New Federal States",
+    c("New Federal States",
       "Old Federal States",
-      "Germany"
-    )
+      "Germany")
   )
 
 # rename factors
@@ -201,6 +196,141 @@ Save figure as .png file.
 ```{r}
 ggsave(
   "figures/plot_1_fertility_rate.png",
+  width = 24,
+  height = 18,
+  units = "cm",
+  dpi = "retina",
+  bg = "white"
+)
+```
+
+## At-Risk-of-Poverty Rate of Families
+
+A visual comparison of the at-risk-of-poverty rate by household type. The rate is measured against the federal median income.
+
+### Reading and Cleaning Data
+
+Reading the .xlsx file readxl's *read_excel* function.
+
+```{r}
+poverty_risk_rate <-
+  read_excel(
+    "data/Armutsgefaehrdungsquote-nach-Haushaltstyp.xlsx",
+    # translate column names from German to English
+    col_names = c(
+      "Year",
+      "One-Person Household",
+      "Two Adults Without Children",
+      "Other Household Without Children",
+      "One Adult With Children",
+      "Two Adults With One Child",
+      "Two Adults With Two Children",
+      "Two Adults With Three Or More Children",
+      "Other Household With Children"
+    ),
+    col_types = rep("numeric", times = 9),
+    skip = 3,
+    n_max = 15
+  )
+```
+
+Subset data to select relevant columns of households with children and the most recent year of the dataset, 2019.
+
+```{r}
+poverty_risk_rate <- poverty_risk_rate %>%
+  filter(Year == 2019) %>%
+  select(
+    `Year`,
+    `One Adult With Children`,
+    `Two Adults With One Child`,
+    `Two Adults With Two Children`,
+    `Two Adults With Three Or More Children`,
+    `Other Household With Children`
+  )
+
+str(poverty_risk_rate)
+```
+
+Reshape data frame to long format.
+
+```{r}
+poverty_risk_rate_long <- poverty_risk_rate %>%
+  gather(key = "Household Type",
+         value = "Poverty Risk Rate", -"Year")
+
+poverty_risk_rate_long
+```
+
+Change the factor order. This changes the order of the labels in the legend of
+the plot.
+
+```{r}
+poverty_risk_rate_long$`Household Type` <-
+  factor(
+    poverty_risk_rate_long$`Household Type`,
+    c(
+      "Other Household With Children",
+      "One Adult With Children",
+      "Two Adults With Three Or More Children",
+      "Two Adults With Two Children",
+      "Two Adults With One Child"
+    )
+  )
+
+levels(poverty_risk_rate_long$`Household Type`)
+```
+
+### Plot Data
+
+Plotting the data as a bar plot.
+
+```{r, fig.width=9.5}
+ggplot(data = poverty_risk_rate_long,
+       mapping = aes(x = `Poverty Risk Rate`,
+                     y = `Household Type`)) +
+  geom_col(fill = colors_primary$dark_gray) +
+  # format x-axis scale as percentage
+  scale_x_continuous(
+    labels = function(x)
+      paste0(x, "%")
+  ) +
+  labs(
+    title = "Fig. 2: At-Risk-Of-Poverty Rate Of Families",
+    subtitle = "Measured by median income",
+    x = element_blank(),
+    y = element_blank(),
+    caption = "Federal Statistical Office, micro-census"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.line = element_line(
+      color = colors_secondary$line,
+      size = 1,
+      linetype = "solid"
+    ),
+    axis.text = element_text(color = colors_secondary$text,
+                             size = rel(1.4)),
+    panel.grid = element_line(color = colors_secondary$line),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    plot.caption = element_text(color = colors_secondary$caption,
+                                size = rel(1.4)),
+    plot.subtitle = element_text(color = colors_secondary$title,
+                                 size = rel(1.6)),
+    plot.title = element_text(
+      color = colors_secondary$title,
+      size = rel(1.8),
+      face = "bold",
+      family = "serif"
+    )
+  )
+```
+
+Save figure as .png file.
+
+```{r}
+ggsave(
+  "figures/plot_2_poverty_risk_rate.png",
   width = 24,
   height = 18,
   units = "cm",
