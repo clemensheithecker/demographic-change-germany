@@ -220,14 +220,14 @@ poverty_risk_rate <-
     # translate column names from German to English
     col_names = c(
       "Year",
-      "One-Person Household",
-      "Two Adults Without Children",
-      "Other Household Without Children",
-      "One Adult With Children",
-      "Two Adults With One Child",
-      "Two Adults With Two Children",
-      "Two Adults With Three Or More Children",
-      "Other Household With Children"
+      "1-Person Household",
+      "2 Adults without Children",
+      "Other Household without Children",
+      "1 Adult with Children",
+      "2 Adults with 1 Child",
+      "2 Adults with 2 Children",
+      "2 Adults with 3+ Children",
+      "Other Household with Children"
     ),
     col_types = rep("numeric", times = 9),
     skip = 3,
@@ -242,11 +242,11 @@ poverty_risk_rate <- poverty_risk_rate %>%
   filter(Year == 2019) %>%
   select(
     `Year`,
-    `One Adult With Children`,
-    `Two Adults With One Child`,
-    `Two Adults With Two Children`,
-    `Two Adults With Three Or More Children`,
-    `Other Household With Children`
+    `1 Adult with Children`,
+    `2 Adults with 1 Child`,
+    `2 Adults with 2 Children`,
+    `2 Adults with 3+ Children`,
+    `Other Household with Children`
   )
 
 str(poverty_risk_rate)
@@ -270,11 +270,11 @@ poverty_risk_rate_long$`Household Type` <-
   factor(
     poverty_risk_rate_long$`Household Type`,
     c(
-      "Other Household With Children",
-      "One Adult With Children",
-      "Two Adults With Three Or More Children",
-      "Two Adults With Two Children",
-      "Two Adults With One Child"
+      "Other Household with Children",
+      "1 Adult with Children",
+      "2 Adults with 3+ Children",
+      "2 Adults with 2 Children",
+      "2 Adults with 1 Child"
     )
   )
 
@@ -323,7 +323,7 @@ ggplot(data = poverty_risk_rate_long,
       size = rel(1.8),
       face = "bold",
       family = "serif"
-    )
+    ),
   )
 ```
 
