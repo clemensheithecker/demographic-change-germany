@@ -490,7 +490,6 @@ Save figure as .png file.
 ```{r}
 ggsave(
   "figures/plot_3_fertility_rate_eu.png",
-  width = 24,
   height = 18,
   units = "cm",
   dpi = "retina",
