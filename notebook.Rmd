@@ -142,7 +142,7 @@ ggplot(
   # setting custom color scale
   scale_color_manual(
     values = c(
-      colors_primary$very_light_gray,
+      colors_primary$light_gray,
       colors_primary$dark_gray,
       colors_primary$blue
     )
